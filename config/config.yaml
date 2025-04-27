@@ -1,0 +1,15 @@
+azure_openai:
+  endpoint: "https://<endpoint>.openai.azure.com/"
+  deployment_name: "gpt-4o"
+  api_version: "2023-03-15-preview"
+  api_key: "<api-key>"
+
+azure_data_explorer:
+  cluster: "https://<endpoint>.<region>.kusto.windows.net"
+  database: "SignalRBI"
+
+agent_settings:
+  max_round: 10
+
+logging:
+  level: INFO

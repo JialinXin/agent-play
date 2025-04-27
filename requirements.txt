@@ -1,0 +1,5 @@
+pyautogen
+openai
+azure-identity
+azure-kusto-data
+pyyaml

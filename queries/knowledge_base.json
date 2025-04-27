@@ -1,0 +1,25 @@
+{
+    "product_usage": {
+      "description": "Query to analyze specific type of customers based on the ResourceId naming, such as AI customers in the default sample.",
+      "template": "BillingUsage_Daily | where {timewindow} and {condition} | extend Revenue = case(SKU == 'Free', 0.0, SKU == 'Standard', 1.61, SKU == 'Premium', 2.0, 1.0) * Quantity //calcuale revenue| join kind = inner (ResourceMetrics) on Date, ResourceId | summarize Revenue = sum(Revenue), Units = sumif(Quantity, SKU in ('Standard', 'Premium')), MessageCount = sum(SumMessageCount), MaxConnectionCount = max(MaxConnectionCount) by ResourceId, Region, SubscriptionId //join usage metrics table| join kind = inner (CustomerModel) on SubscriptionId //join customer information| where SubscriptionId != 'c24a3833-f66c-4c0b-8263-91c5cc408ff9' | where MessageCount > 10000 and MaxConnectionCount > 20 //filter active| top {limit} by {order_by} | project {fields}",
+      "fields": ["ResourceId", "Region", "SubscriptionId", "SubscriptionCreatedDate", "Revenue", "Units", "MessageCount", "MaxConnectionCount", "CustomerName", "BillingType", "SegmentName", "S500"],
+      "source_type": "table",
+      "source_name": "BillingUsage_Daily",
+      "default_timewindow": "Date >= startofmonth(now(), -1) and Date < startofmonth(now())",
+      "default_condition": "Date >= startofmonth(now(), -1) and Date < startofmonth(now()) and (ResourceId has 'ai' or ResourceId has 'gpt' or ResourceId has 'ml' or ResourceId has 'cognitive' or ResourceId contains 'openai' or ResourceId contains 'chatgpt')",
+      "default_order_by": "Revenue desc",
+      "default_limit": 10
+    },
+    "css_tickets": {
+        "description" : "Query to analyze CSS(Customer Service and Support) tickets",
+        "template": "CSSTicketsByStartTime({timewindow}) | where {condition} | project {fields} | top {limit} by {order_by}",
+        "fields": ["SupportProductName", "Title", "Severity", "Status", "IncidentId", "CreatedDateTime", "Customer_CloudCustomerDisplayName", "ResourceUri", "IssueDescription"],
+        "source_type": "function",
+        "source_name": "CSSTicketsByStartTime",
+        "default_timewindow": "startofmonth(now(), -1)",
+        "default_condition": [ "1==1"],
+        "default_order_by": "CreatedDateTime asc",
+        "default_limit": 100
+    }
+  }
+  
